@@ -57,12 +57,16 @@ public class UiController {
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
             model.addAttribute("me", auth.getName());
             boolean isAdmin = guard.isAdmin(auth);
+            boolean isTechnician = auth.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_TECHNICIAN"));
             model.addAttribute("isAdmin", isAdmin);
             model.addAttribute("isStaff", guard.isStaff(auth));
+            model.addAttribute("isTechnician", isTechnician);
         } else {
             model.addAttribute("me", "");
             model.addAttribute("isAdmin", false);
             model.addAttribute("isStaff", false);
+            model.addAttribute("isTechnician", false);
         }
     }
 
@@ -96,8 +100,11 @@ public class UiController {
                                 @RequestParam(required = false) String text,
                                 @RequestParam(required = false, defaultValue = "false") boolean mine,
                                 Authentication auth, Model model) {
+        boolean isTechnician = auth != null && auth.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_TECHNICIAN"));
+        model.addAttribute("isTechnician", isTechnician);
         Long assignedTechId = null;
-        if (mine && guard.isStaff(auth)) {
+        if (mine && isTechnician) {
             User user = userRepo.findByEmail(auth.getName()).orElse(null);
             if (user instanceof Technician) assignedTechId = user.getId();
         }
@@ -110,7 +117,7 @@ public class UiController {
         model.addAttribute("status", status);
         model.addAttribute("priority", priority);
         model.addAttribute("text", text);
-        model.addAttribute("mine", mine && assignedTechId != null);
+        model.addAttribute("mine", mine && isTechnician && assignedTechId != null);
         return "incidents";
     }
 

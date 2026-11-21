@@ -12,7 +12,7 @@
     <select name="priority"><option value="">Any priority</option>
       <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}" th:selected="${p == priority}"></option></select>
     <input type="text" name="text" placeholder="Search description" th:value="${text}">
-    <label th:if="${isStaff}"><input type="checkbox" name="mine" value="true" th:checked="${mine}"> My assigned</label>
+    <label th:if="${isTechnician}"><input type="checkbox" name="mine" value="true" th:checked="${mine}"> My assigned</label>
     <button type="submit">Filter</button>
   </form>
   <table>
