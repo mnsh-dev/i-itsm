@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head><meta charset="UTF-8"><title>Dashboard</title><link rel="stylesheet" th:href="@{/css/app.css}"></head>
+<body>
+<div th:replace="~{fragments :: nav}"></div>
+<main>
+    <h2>Incident overview</h2>
+    <div class="cards">
+        <div class="card kpi-card"><b class="kpi-value" th:text="${d.overview().total()}"></b><span class="kpi-label">Total</span></div>
+        <div class="card kpi-card"><b class="kpi-value" th:text="${d.overview().open()}"></b><span class="kpi-label">Open</span></div>
+        <div class="card kpi-card"><b class="kpi-value" th:text="${d.overview().critical()}"></b><span class="kpi-label">Critical (open P1)</span></div>
+        <div class="card kpi-card"><b class="kpi-value" th:text="${d.overview().resolved()}"></b><span class="kpi-label">Resolved</span></div>
+        <div class="card kpi-card"><b class="kpi-value" th:text="${d.overview().slaViolations()}"></b><span class="kpi-label">SLA violations</span></div>
+        <div class="card kpi-card"><b class="kpi-value" th:text="${d.overview().avgResolutionMinutes()}"></b><span class="kpi-label">Avg resolution (min)</span></div>
+    </div>
+    <div class="cols">
+        <div th:replace="~{fragments :: counts('By service', ${d.byService()})}"></div>
+        <div th:replace="~{fragments :: counts('By category', ${d.byCategory()})}"></div>
+        <div th:replace="~{fragments :: counts('By priority', ${d.byPriority()})}"></div>
+        <div th:replace="~{fragments :: counts('By status', ${d.byStatus()})}"></div>
+    </div>
+    <h2>Technician workload</h2>
+    <table class="workload-table">
+        <tr><th>Technician</th><th>Active incidents</th><th>Capacity</th></tr>
+        <tr th:each="w : ${workloads}"><td th:text="${w.name}"></td><td th:text="${w.activeIncidents}"></td><td th:text="${w.maxWorkload}"></td></tr>
+    </table>
+</main>
+</body>
+</html>

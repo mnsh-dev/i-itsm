@@ -1,0 +1,37 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body.auth-page { min-height: 100vh; display: grid; grid-template-columns: 1.05fr 1fr; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; background: #f8fafc; color: #0f172a; }
+.brand-panel { background: linear-gradient(145deg, #0f172a 0%, #1e293b 55%, #1d4ed8 100%); color: #f8fafc; padding: 3.5rem 4rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.brand-badge { display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 700; font-size: 1.15rem; }
+.logo-icon { width: 36px; height: 36px; border-radius: 10px; background: #3b82f6; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(59, 130, 246, 0.45); }
+.brand-hero h1 { font-size: 2.2rem; line-height: 1.2; font-weight: 700; margin-bottom: 1rem; }
+.brand-hero p { color: #cbd5e1; font-size: 1rem; line-height: 1.6; max-width: 440px; margin-bottom: 2rem; }
+.brand-footer { font-size: 0.82rem; color: #94a3b8; }
+.form-panel { display: flex; align-items: center; justify-content: center; padding: 2.5rem 2rem; background: #ffffff; }
+.auth-card { width: 100%; max-width: 410px; }
+.auth-header { margin-bottom: 1.75rem; }
+.auth-header h2 { font-size: 1.65rem; font-weight: 700; color: #0f172a; margin-bottom: 0.4rem; }
+.auth-header p { color: #64748b; font-size: 0.92rem; }
+.alert { padding: 0.75rem 0.95rem; border-radius: 8px; font-size: 0.88rem; margin-bottom: 1.25rem; border: 1px solid transparent; }
+.alert-err { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.alert-ok { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.field { margin-bottom: 1.15rem; }
+.field label { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.4rem; }
+.input-wrap { position: relative; }
+.field input { width: 100%; padding: 0.7rem 0.9rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; color: #0f172a; background: #f8fafc; }
+.field input:focus { outline: none; background: #ffffff; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+.toggle-pw { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+.btn-primary { width: 100%; padding: 0.78rem 1rem; background: #2563eb; color: #ffffff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 0.35rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-google { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 0.7rem; padding: 0.65rem 1rem; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #334155; font-size: 0.92rem; font-weight: 600; text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+.btn-google:hover { background: #f8fafc; border-color: #94a3b8; }
+.btn-google svg { flex: none; }
+.divider { display: flex; align-items: center; gap: 0.8rem; margin: 1.15rem 0; color: #94a3b8; font-size: 0.78rem; white-space: nowrap; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #e2e8f0; }
+.demo-box { margin-top: 1.5rem; padding: 0.9rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; }
+.demo-title { font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.55rem; }
+.demo-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
+.chip { padding: 0.45rem 0.5rem; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.78rem; font-weight: 600; color: #334155; cursor: pointer; text-align: center; }
+.chip:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+.auth-footer { margin-top: 1.5rem; text-align: center; font-size: 0.88rem; color: #64748b; }
+.auth-footer a { color: #2563eb; font-weight: 600; text-decoration: none; }
+@media (max-width: 860px) { body.auth-page { grid-template-columns: 1fr; } .brand-panel { display: none; } }

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head><meta charset="UTF-8"><title>Admin</title><link rel="stylesheet" th:href="@{/css/app.css}"></head>
+<body>
+<div th:replace="~{fragments :: nav}"></div>
+<main>
+    <div th:replace="~{fragments :: flash}"></div>
+
+    <h2>User management</h2>
+    <form method="post" th:action="@{/ui/admin/users}" class="inline">
+        <input name="name" placeholder="Full name" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Temporary password" required>
+        <select name="role"><option th:each="r : ${T(com.example.demo.Role).values()}" th:value="${r}" th:text="${r}"></option></select>
+        <input name="department" placeholder="Department (employees)">
+        <input name="skills" placeholder="Skills (comma-separated)">
+        <input name="experienceYears" type="number" min="0" placeholder="Experience">
+        <input name="maxWorkload" type="number" min="1" placeholder="Capacity">
+        <button type="submit">Create user</button>
+    </form>
+    <table>
+        <tr><th>Name</th><th>Email</th><th>Role</th><th>Update role</th></tr>
+        <tr th:each="u : ${users}">
+            <td th:text="${u.name}"></td><td th:text="${u.email}"></td><td th:text="${u.role}"></td>
+            <td><form method="post" th:action="@{/ui/admin/users/{id}/role(id=${u.id})}" class="inline">
+                <select name="role"><option th:each="r : ${T(com.example.demo.Role).values()}" th:value="${r}" th:text="${r}" th:selected="${r == u.role}"></option></select>
+                <button type="submit">Save role</button>
+            </form></td>
+        </tr>
+    </table>
+
+    <h2>Technician management</h2>
+    <form method="post" th:action="@{/ui/admin/technicians}" class="inline">
+        <input name="name" placeholder="Technician name" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Temporary password" required>
+        <input name="skills" placeholder="Skills (comma-separated)">
+        <input name="experienceYears" type="number" min="0" value="0" placeholder="Experience">
+        <input name="maxWorkload" type="number" min="1" value="5" placeholder="Capacity">
+        <button type="submit">Create technician</button>
+    </form>
+    <table>
+        <tr><th>Technician</th><th>Email</th><th>Active workload</th><th>Skills / experience / capacity / availability</th></tr>
+        <tr th:each="t : ${technicians}">
+            <td th:text="${t.name}"></td><td th:text="${t.email}"></td><td th:text="${t.activeWorkload}"></td>
+            <td><form method="post" th:action="@{/ui/admin/technicians/{id}(id=${t.id})}" class="inline">
+                <input name="skills" th:value="${t.skillsText}" placeholder="Comma-separated skills">
+                <input name="experienceYears" type="number" min="0" th:value="${t.experienceYears}">
+                <input name="maxWorkload" type="number" min="1" th:value="${t.maxWorkload}">
+                <label><input name="active" type="checkbox" value="true" th:checked="${t.active}"> Active</label>
+                <button type="submit">Save technician</button>
+            </form></td>
+        </tr>
+    </table>
+
+    <h2>IT service management</h2>
+    <form method="post" th:action="@{/ui/admin/services}" class="inline">
+        <input name="name" placeholder="Service name" required>
+        <input name="businessCriticality" type="number" min="1" max="5" placeholder="Criticality 1–5" required>
+        <button type="submit">Add service</button>
+    </form>
+    <table>
+        <tr><th>Service and criticality</th><th>Update</th></tr>
+        <tr th:each="s : ${services}">
+            <td th:text="${s.name + ' — criticality ' + s.businessCriticality}"></td>
+            <td><form method="post" th:action="@{/ui/admin/services/{id}(id=${s.id})}" class="inline">
+                <input name="name" th:value="${s.name}" required>
+                <input name="businessCriticality" type="number" min="1" max="5" th:value="${s.businessCriticality}" required>
+                <button type="submit">Save service</button>
+            </form></td>
+        </tr>
+    </table>
+
+    <h2>Incident category management</h2>
+    <form method="post" th:action="@{/ui/admin/categories}" class="inline">
+        <input name="name" placeholder="Category name" required>
+        <button type="submit">Add category</button>
+    </form>
+    <table>
+        <tr><th>Category</th><th>Update</th></tr>
+        <tr th:each="c : ${categories}"><td th:text="${c.name}"></td>
+            <td><form method="post" th:action="@{/ui/admin/categories/{id}(id=${c.id})}" class="inline">
+                <input name="name" th:value="${c.name}" required>
+                <button type="submit">Save category</button>
+            </form></td>
+        </tr>
+    </table>
+
+    <h2>Assignment strategy</h2>
+    <form method="post" th:action="@{/ui/admin/strategy}" class="inline">
+        <select name="name">
+            <option th:each="s : ${strategies}" th:value="${s}" th:text="${s}" th:selected="${s == activeStrategy}"></option>
+        </select>
+        <button type="submit">Apply</button>
+    </form>
+
+    <h2>SLA policies</h2>
+    <table>
+        <tr><th>Priority</th><th>Service</th><th>Response / resolution target (minutes)</th></tr>
+        <tr th:each="p : ${policies}">
+            <td th:text="${p.priority}"></td>
+            <td th:text="${p.service?.name ?: 'All services'}"></td>
+            <td>
+                <form method="post" th:action="@{/ui/admin/sla/{id}(id=${p.id})}" class="inline">
+                    <input type="number" name="response" min="1" th:value="${p.responseMinutes}">
+                    <input type="number" name="resolution" min="1" th:value="${p.resolutionMinutes}">
+                    <button type="submit">Save</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Audit log (latest 50)</h2>
+    <table>
+        <tr><th>Time</th><th>User</th><th>Incident</th><th>Action</th><th>From</th><th>To</th><th>Description</th></tr>
+        <tr th:each="h : ${audit}">
+            <td th:text="${#temporals.format(h.timestamp, 'dd MMM HH:mm:ss')}"></td>
+            <td th:text="${h.actor}"></td>
+            <td><a th:href="@{/ui/incidents/{id}(id=${h.incidentId})}" th:text="${'INC' + h.incidentId}"></a></td>
+            <td th:text="${h.action}"></td><td th:text="${h.previousState}"></td><td th:text="${h.newState}"></td>
+            <td th:text="${h.description}"></td>
+        </tr>
+    </table>
+</main>
+</body>
+</html>
