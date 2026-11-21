@@ -126,11 +126,12 @@ public class UiController {
     public String createIncident(@RequestParam String description, @RequestParam Long serviceId,
                                  @RequestParam(required = false) Long categoryId,
                                  @RequestParam int impact, @RequestParam int urgency,
+                                 @RequestParam(defaultValue = "1") int affectedUsers,
                                  Authentication auth, RedirectAttributes ra) {
         guard.requireCanCreate(auth);
         try {
             Incident created = incidentService.create(
-                    new CreateIncidentRequest(description, serviceId, categoryId, impact, urgency), auth.getName());
+                    new CreateIncidentRequest(description, serviceId, categoryId, impact, urgency, affectedUsers), auth.getName());
             ra.addFlashAttribute("ok", "Incident INC" + created.getId() + " created.");
             return "redirect:/ui/incidents/" + created.getId();
         } catch (Exception ex) {

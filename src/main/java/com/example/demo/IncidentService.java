@@ -52,9 +52,11 @@ public class IncidentService {
 				.orElseThrow(() -> new ResourceNotFoundException("Category", req.categoryId()))
 				: null;
 
-		PriorityResult pr = priorityStrategy.calculate(req.impact(), req.urgency(), svc.getBusinessCriticality());
+		int affectedUsers = req.affectedUsers() == null ? 1 : Math.max(1, req.affectedUsers());
+		PriorityResult pr = priorityStrategy.calculate(req.impact(), req.urgency(),
+				svc.getBusinessCriticality(), affectedUsers);
 		Incident saved = repo.save(new Incident(req.description(), reporter, svc, cat,
-				req.impact(), req.urgency(), pr));
+				req.impact(), req.urgency(), affectedUsers, pr));
 		publish(saved, EventType.CREATED, null);
 		correlationService.correlateIfRelated(saved);
 		return saved;

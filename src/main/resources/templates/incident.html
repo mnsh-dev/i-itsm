@@ -29,6 +29,7 @@
         <tr><th>Service</th><td th:text="${incident.service.name + ' (criticality ' + incident.service.businessCriticality + ')'}"></td></tr>
         <tr><th>Category</th><td th:text="${incident.category?.name ?: 'Not classified yet'}"></td></tr>
         <tr><th>Impact / urgency</th><td th:text="${incident.impact + ' / ' + incident.urgency + ' (score ' + incident.priorityScore + ')'}"></td></tr>
+        <tr><th>Affected users</th><td th:text="${incident.affectedUsers}"></td></tr>
         <tr><th>Technician</th><td th:text="${incident.assignedTo?.name ?: 'Unassigned'}"></td></tr>
         <tr><th>Created</th><td th:text="${#temporals.format(incident.createdAt, 'dd MMM yyyy HH:mm:ss')}"></td></tr>
         <tr th:if="${incident.resolution != null}"><th>Resolution</th><td th:text="${incident.resolution}"></td></tr>

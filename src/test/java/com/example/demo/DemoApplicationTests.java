@@ -89,6 +89,19 @@ class DemoApplicationTests {
         assertEquals(expectedScore, result.score());
     }
 
+    @Test
+    void affectedUsersIncreasePriorityForTheSameIncidentFactors() {
+        Incident singleUser = createIncident("Single user report for payroll portal", 2, 2, 1);
+        Incident widespread = createIncident("Widespread user report for file storage outage", 2, 2, 100);
+
+        assertEquals(Priority.P3, singleUser.getPriority());
+        assertEquals(Priority.P2, widespread.getPriority());
+        assertEquals(1, singleUser.getAffectedUsers());
+        assertEquals(100, widespread.getAffectedUsers());
+        assertTrue(new ScoreBasedPriorityStrategy().calculate(2, 2, 5, 100)
+                .breakdown().contains("100 users"));
+    }
+
     @ParameterizedTest
     @CsvSource({
             "VPN network connection is down,Network",
@@ -338,10 +351,15 @@ class DemoApplicationTests {
     }
 
     private Incident createIncident(String description, int impact, int urgency) {
+        return createIncident(description, impact, urgency, 1);
+    }
+
+    private Incident createIncident(String description, int impact, int urgency, int affectedUsers) {
         User reporter = ensureEmployee("asha@corp.test", "Asha");
         ItService payment = serviceRepository.findAll().stream()
                 .filter(service -> "Payment".equals(service.getName())).findFirst().orElseThrow();
-        return incidentService.create(new CreateIncidentRequest(description, payment.getId(), null, impact, urgency),
+        return incidentService.create(new CreateIncidentRequest(description, payment.getId(), null, impact, urgency,
+                        affectedUsers),
                 reporter.getEmail());
     }
 

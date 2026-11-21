@@ -19,6 +19,8 @@
       <select name="impact"><option th:each="n : ${#numbers.sequence(1,5)}" th:value="${n}" th:text="${n}" th:selected="${n == 3}"></option></select></label>
     <label>Urgency (1 = can wait, 5 = needs fixing now)
       <select name="urgency"><option th:each="n : ${#numbers.sequence(1,5)}" th:value="${n}" th:text="${n}" th:selected="${n == 3}"></option></select></label>
+    <label>Number of affected users
+      <input name="affectedUsers" type="number" min="1" value="1" required></label>
     <button type="submit">Submit incident</button>
   </form>
 </main>

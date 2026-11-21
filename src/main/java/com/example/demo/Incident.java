@@ -33,6 +33,8 @@ public class Incident {
 
 	private int impact;
 	private int urgency;
+	@Column(nullable = false)
+	private int affectedUsers = 1;
 	private int priorityScore;
 	@Enumerated(EnumType.STRING)
 	private Priority priority;
@@ -41,12 +43,18 @@ public class Incident {
 
 	public Incident(String description, User reporter, ItService service, Category category,
 					int impact, int urgency, PriorityResult priorityResult) {
+		this(description, reporter, service, category, impact, urgency, 1, priorityResult);
+	}
+
+	public Incident(String description, User reporter, ItService service, Category category,
+					int impact, int urgency, int affectedUsers, PriorityResult priorityResult) {
 		this.description = description;
 		this.reporter = reporter;
 		this.service = service;
 		this.category = category;
 		this.impact = impact;
 		this.urgency = urgency;
+		setAffectedUsers(affectedUsers);
 		this.priority = priorityResult.priority();
 		this.priorityScore = priorityResult.score();
 		this.status = IncidentStatus.NEW;
@@ -68,6 +76,8 @@ public class Incident {
 	public Category getCategory() { return category; }
 	public int getImpact() { return impact; }
 	public int getUrgency() { return urgency; }
+	public int getAffectedUsers() { return Math.max(1, affectedUsers); }
+	public void setAffectedUsers(int affectedUsers) { this.affectedUsers = Math.max(1, affectedUsers); }
 	public Priority getPriority() { return priority; }
 	public int getPriorityScore() { return priorityScore; }
 	public Technician getAssignedTo() { return assignedTo; }
