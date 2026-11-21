@@ -10,11 +10,6 @@
 <div th:replace="~{fragments :: nav}"></div>
 <main class="admin-console">
     <div th:replace="~{fragments :: flash}"></div>
-    <header class="admin-page-heading">
-        <div><p class="eyebrow">Control center</p><h1>Administrator console</h1></div>
-        <p>Manage access, operations, and incident configuration.</p>
-    </header>
-
     <section class="admin-card">
         <div class="admin-section-heading"><div><h2>User management</h2><p>Create accounts and manage portal roles.</p></div></div>
         <form method="post" th:action="@{/ui/admin/users}" class="admin-form-grid">

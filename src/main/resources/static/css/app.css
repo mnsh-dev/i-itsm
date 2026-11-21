@@ -46,7 +46,7 @@ header, nav.topbar {
     border-bottom: 3px solid var(--nav-accent);
     position: sticky;
     top: 0;
-    z-index: 20;
+    z-index: 100;
 }
 header a, nav.topbar a {
     color: #cbd5e1;
@@ -394,26 +394,10 @@ td a:hover { text-decoration: underline; }
 }
 
 .admin-console { max-width: 1240px; }
-.admin-page-heading {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.4rem;
-}
-.admin-page-heading h1 { margin-bottom: 0; }
-.admin-page-heading > p, .admin-section-heading p {
+.admin-section-heading p {
     color: #64748b;
     margin: 0;
     font-size: 0.9rem;
-}
-.eyebrow {
-    color: var(--brand);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin: 0 0 0.25rem;
 }
 .admin-card {
     background: #fff;
@@ -498,7 +482,6 @@ form.inline {
 .admin-compact-card form.inline select { flex: 1 1 240px; }
 
 @media (max-width: 720px) {
-    .admin-page-heading { align-items: start; flex-direction: column; }
     .admin-card { padding: 1rem; }
     .compact-admin-form { grid-template-columns: 1fr; }
 }
