@@ -207,6 +207,8 @@ class GlobalExceptionHandler {
 
 @Component
 class DataSeeder implements CommandLineRunner {
+	private static final List<String> INCIDENT_CATEGORIES = List.of(
+			"Hardware", "Software", "Network", "Database", "Cloud", "Security", "Authentication", "Application");
 	private final UserRepository users;
 	private final ItServiceRepository services;
 	private final CategoryRepository categories;
@@ -222,23 +224,33 @@ class DataSeeder implements CommandLineRunner {
 
 	@Override
 	public void run(String @NonNull ... args) {
+		Set<String> existingCategoryNames = new HashSet<>();
+		for (Category category : categories.findAll()) {
+			if (category.getName() != null)
+				existingCategoryNames.add(category.getName().trim().toLowerCase(Locale.ROOT));
+		}
+		for (String name : INCIDENT_CATEGORIES) {
+			if (existingCategoryNames.add(name.toLowerCase(Locale.ROOT)))
+				categories.save(new Category(name));
+		}
+		for (SlaPolicy policy : policies.findAll()) {
+			if (policy.getService() != null && policy.getPriority() == Priority.P2)
+				policies.delete(policy);
+		}
+
 		if (users.count() > 0) return;
 		saveUser(new Employee("Asha", "asha@corp.test", "Finance"));
 		saveUser(new Technician("Ravi", "ravi@corp.test", Set.of("Network", "Database"), 5, 5));
 		saveUser(new Technician("Meera", "meera@corp.test", Set.of("Application", "Cloud"), 3, 4));
 		saveUser(new Administrator("Admin", "admin@corp.test"));
 		saveUser(new Employee("Dev", "dev@corp.test", "Sales"));
-		ItService payment = services.save(new ItService("Payment", 5));
+		services.save(new ItService("Payment", 5));
 		policies.save(new SlaPolicy(Priority.P1, null, 5, 30));
 		policies.save(new SlaPolicy(Priority.P2, null, 15, 120));
 		policies.save(new SlaPolicy(Priority.P3, null, 60, 480));
 		policies.save(new SlaPolicy(Priority.P4, null, 240, 1440));
-		policies.save(new SlaPolicy(Priority.P2, payment, 10, 90));   // Payment gets a stricter P2 SLA
 		services.save(new ItService("Email", 2));
 		services.save(new ItService("Network", 4));
-		categories.save(new Category("Application"));
-		categories.save(new Category("Network"));
-		categories.save(new Category("Database"));
 		System.out.println("Seeded: " + users.count() + " users, "
 				+ services.count() + " services, " + categories.count() + " categories");
 	}

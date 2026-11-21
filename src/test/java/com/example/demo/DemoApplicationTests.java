@@ -55,7 +55,7 @@ class DemoApplicationTests {
             admin.changePassword(passwordEncoder.encode("password123"));
             userRepository.save(admin);
         }
-        ItService payment = ensureService("Payment", 5);
+        ensureService("Payment", 5);
         ensureService("Network", 4);
         ensureService("Email", 2);
         for (Priority priority : Priority.values()) {
@@ -75,8 +75,6 @@ class DemoApplicationTests {
                 policyRepository.save(new SlaPolicy(priority, null, response, resolution));
             }
         }
-        if (policyRepository.findFirstByPriorityAndServiceId(Priority.P2, payment.getId()).isEmpty())
-            policyRepository.save(new SlaPolicy(Priority.P2, payment, 10, 90));
         ensureCategory("Application");
         ensureCategory("Network");
         ensureCategory("Database");
@@ -177,12 +175,12 @@ class DemoApplicationTests {
     }
 
     @Test
-    void slaPolicyUsesServiceSpecificTargetWhenAvailable() {
+    void slaPolicyUsesGlobalTargetWhenNoServiceSpecificOverrideExists() {
         Incident p2Payment = createIncident("Payment issue", 3, 2);
         assertEquals(Priority.P2, p2Payment.getPriority());
         SlaPolicy target = slaService.policyFor(p2Payment);
-        assertEquals(10, target.getResponseMinutes());
-        assertEquals(90, target.getResolutionMinutes());
+        assertEquals(15, target.getResponseMinutes());
+        assertEquals(120, target.getResolutionMinutes());
     }
 
     @Test
