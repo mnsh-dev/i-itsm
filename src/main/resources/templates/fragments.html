@@ -22,6 +22,9 @@
             <button type="submit">Log out</button>
         </form>
     </div>
+    <script th:inline="javascript">
+        document.body.classList.add(/*[[${isAdmin ? 'theme-admin' : (isStaff ? 'theme-tech' : 'theme-emp')}]]*/ 'theme-emp');
+    </script>
 </nav>
 <div th:fragment="flash">
     <p class="msg ok" th:if="${ok}" th:text="${ok}"></p>

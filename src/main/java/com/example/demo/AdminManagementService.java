@@ -122,6 +122,15 @@ public class AdminManagementService {
         return service;
     }
 
+    @Transactional
+    public void deleteService(Long id) {
+        ItService service = services.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Service", id));
+        if (incidents.existsByServiceId(id))
+            throw new IllegalArgumentException("Cannot delete service because it is used by existing incidents");
+        services.delete(service);
+    }
+
     public List<Category> categories() { return categories.findAll(); }
 
     @Transactional
@@ -135,6 +144,15 @@ public class AdminManagementService {
         Category category = categories.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category", id));
         category.updateName(name);
         return category;
+    }
+
+    @Transactional
+    public void deleteCategory(Long id) {
+        Category category = categories.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", id));
+        if (incidents.existsByCategoryId(id))
+            throw new IllegalArgumentException("Cannot delete category because it is used by existing incidents");
+        categories.delete(category);
     }
 
     private void validateIdentity(String name, String email, String password) {

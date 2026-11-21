@@ -1,126 +1,167 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="">
-<head><meta charset="UTF-8"><title>Admin</title><link rel="stylesheet" th:href="@{/css/app.css}"></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
 <body>
 <div th:replace="~{fragments :: nav}"></div>
-<main>
+<main class="admin-console">
     <div th:replace="~{fragments :: flash}"></div>
+    <header class="admin-page-heading">
+        <div><p class="eyebrow">Control center</p><h1>Administrator console</h1></div>
+        <p>Manage access, operations, and incident configuration.</p>
+    </header>
 
-    <h2>User management</h2>
-    <form method="post" th:action="@{/ui/admin/users}" class="inline">
-        <input name="name" placeholder="Full name" required>
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="password" type="password" placeholder="Temporary password" required>
-        <select name="role"><option th:each="r : ${T(com.example.demo.Role).values()}" th:value="${r}" th:text="${r}"></option></select>
-        <input name="department" placeholder="Department (employees)">
-        <input name="skills" placeholder="Skills (comma-separated)">
-        <input name="experienceYears" type="number" min="0" placeholder="Experience">
-        <input name="maxWorkload" type="number" min="1" placeholder="Capacity">
-        <button type="submit">Create user</button>
-    </form>
-    <table>
-        <tr><th>Name</th><th>Email</th><th>Role</th><th>Update role</th></tr>
-        <tr th:each="u : ${users}">
-            <td th:text="${u.name}"></td><td th:text="${u.email}"></td><td th:text="${u.role}"></td>
-            <td><form method="post" th:action="@{/ui/admin/users/{id}/role(id=${u.id})}" class="inline">
-                <select name="role"><option th:each="r : ${T(com.example.demo.Role).values()}" th:value="${r}" th:text="${r}" th:selected="${r == u.role}"></option></select>
-                <button type="submit">Save role</button>
-            </form></td>
-        </tr>
-    </table>
+    <section class="admin-card">
+        <div class="admin-section-heading"><div><h2>User management</h2><p>Create accounts and manage portal roles.</p></div></div>
+        <form method="post" th:action="@{/ui/admin/users}" class="admin-form-grid">
+            <label>Full name<input name="name" type="text" placeholder="Full name" required></label>
+            <label>Email<input name="email" type="email" placeholder="name@company.com" required></label>
+            <label>Temporary password<input name="password" type="password" placeholder="Temporary password" required></label>
+            <label>Role<select name="role"><option th:each="r : ${T(com.example.demo.Role).values()}" th:value="${r}" th:text="${r}"></option></select></label>
+            <label>Department<input name="department" type="text" placeholder="Department"></label>
+            <label>Skills<input name="skills" type="text" placeholder="Comma-separated skills"></label>
+            <label>Experience<input name="experienceYears" type="number" min="0" placeholder="Years"></label>
+            <label>Capacity<input name="maxWorkload" type="number" min="1" placeholder="Incident limit"></label>
+            <button type="submit" class="admin-form-submit">Create user</button>
+        </form>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Update role</th></tr></thead>
+                <tbody><tr th:each="u : ${users}">
+                    <td th:text="${u.name}"></td><td th:text="${u.email}"></td>
+                    <td><span class="role-badge" th:classappend="${' role-' + u.role}" th:text="${u.role}"></span></td>
+                    <td><form method="post" th:action="@{/ui/admin/users/{id}/role(id=${u.id})}" class="inline">
+                        <select name="role"><option th:each="r : ${T(com.example.demo.Role).values()}" th:value="${r}" th:text="${r}" th:selected="${r == u.role}"></option></select>
+                        <button type="submit">Save role</button>
+                    </form></td>
+                </tr></tbody>
+            </table>
+        </div>
+    </section>
 
-    <h2>Technician management</h2>
-    <form method="post" th:action="@{/ui/admin/technicians}" class="inline">
-        <input name="name" placeholder="Technician name" required>
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="password" type="password" placeholder="Temporary password" required>
-        <input name="skills" placeholder="Skills (comma-separated)">
-        <input name="experienceYears" type="number" min="0" value="0" placeholder="Experience">
-        <input name="maxWorkload" type="number" min="1" value="5" placeholder="Capacity">
-        <button type="submit">Create technician</button>
-    </form>
-    <table>
-        <tr><th>Technician</th><th>Email</th><th>Active workload</th><th>Skills / experience / capacity / availability</th></tr>
-        <tr th:each="t : ${technicians}">
-            <td th:text="${t.name}"></td><td th:text="${t.email}"></td><td th:text="${t.activeWorkload}"></td>
-            <td><form method="post" th:action="@{/ui/admin/technicians/{id}(id=${t.id})}" class="inline">
-                <input name="skills" th:value="${t.skillsText}" placeholder="Comma-separated skills">
-                <input name="experienceYears" type="number" min="0" th:value="${t.experienceYears}">
-                <input name="maxWorkload" type="number" min="1" th:value="${t.maxWorkload}">
-                <label><input name="active" type="checkbox" value="true" th:checked="${t.active}"> Active</label>
-                <button type="submit">Save technician</button>
-            </form></td>
-        </tr>
-    </table>
+    <section class="admin-card">
+        <div class="admin-section-heading"><div><h2>Technician management</h2><p>Set specialties, capacity, and availability.</p></div></div>
+        <form method="post" th:action="@{/ui/admin/technicians}" class="admin-form-grid technician-create-form">
+            <label>Full name<input name="name" type="text" placeholder="Technician name" required></label>
+            <label>Email<input name="email" type="email" placeholder="name@company.com" required></label>
+            <label>Temporary password<input name="password" type="password" placeholder="Temporary password" required></label>
+            <label>Skills<input name="skills" type="text" placeholder="Comma-separated skills"></label>
+            <label>Experience<input name="experienceYears" type="number" min="0" value="0" placeholder="Years"></label>
+            <label>Capacity<input name="maxWorkload" type="number" min="1" value="5" placeholder="Incident limit"></label>
+            <button type="submit" class="admin-form-submit">Create technician</button>
+        </form>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Technician</th><th>Email</th><th>Active workload</th><th>Skills, experience, capacity and availability</th></tr></thead>
+                <tbody><tr th:each="t : ${technicians}">
+                    <td th:text="${t.name}"></td><td th:text="${t.email}"></td><td th:text="${t.activeWorkload}"></td>
+                    <td><form method="post" th:action="@{/ui/admin/technicians/{id}(id=${t.id})}" class="inline">
+                        <input name="skills" type="text" th:value="${t.skillsText}" placeholder="Skills">
+                        <input name="experienceYears" type="number" min="0" th:value="${t.experienceYears}" aria-label="Experience years">
+                        <input name="maxWorkload" type="number" min="1" th:value="${t.maxWorkload}" aria-label="Capacity">
+                        <label class="inline-check"><input name="active" type="checkbox" value="true" th:checked="${t.active}"> Active</label>
+                        <button type="submit">Save</button>
+                    </form></td>
+                </tr></tbody>
+            </table>
+        </div>
+    </section>
 
-    <h2>IT service management</h2>
-    <form method="post" th:action="@{/ui/admin/services}" class="inline">
-        <input name="name" placeholder="Service name" required>
-        <input name="businessCriticality" type="number" min="1" max="5" placeholder="Criticality 1–5" required>
-        <button type="submit">Add service</button>
-    </form>
-    <table>
-        <tr><th>Service and criticality</th><th>Update</th></tr>
-        <tr th:each="s : ${services}">
-            <td th:text="${s.name + ' — criticality ' + s.businessCriticality}"></td>
-            <td><form method="post" th:action="@{/ui/admin/services/{id}(id=${s.id})}" class="inline">
-                <input name="name" th:value="${s.name}" required>
-                <input name="businessCriticality" type="number" min="1" max="5" th:value="${s.businessCriticality}" required>
-                <button type="submit">Save service</button>
-            </form></td>
-        </tr>
-    </table>
+    <section class="admin-card">
+        <div class="admin-section-heading"><div><h2>IT service management</h2><p>Maintain service names and business criticality.</p></div></div>
+        <form method="post" th:action="@{/ui/admin/services}" class="admin-form-grid compact-admin-form">
+            <label>Service name<input name="name" type="text" placeholder="Service name" required></label>
+            <label>Criticality (1-5)<input name="businessCriticality" type="number" min="1" max="5" placeholder="1 to 5" required></label>
+            <button type="submit" class="admin-form-submit">Add service</button>
+        </form>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Service and criticality</th><th>Update</th></tr></thead>
+                <tbody><tr th:each="s : ${services}">
+                    <td th:text="${s.name + ' — criticality ' + s.businessCriticality}"></td>
+                    <td><div class="admin-actions">
+                        <form method="post" th:action="@{/ui/admin/services/{id}(id=${s.id})}" class="inline">
+                            <input name="name" type="text" th:value="${s.name}" aria-label="Service name" required>
+                            <input name="businessCriticality" type="number" min="1" max="5" th:value="${s.businessCriticality}" aria-label="Criticality 1 to 5" required>
+                            <button type="submit">Save</button>
+                        </form>
+                        <form method="post" th:action="@{/ui/admin/services/{id}/delete(id=${s.id})}" onsubmit="return confirm('Delete this service?');">
+                            <button type="submit" class="btn-icon-danger" title="Delete" aria-label="Delete service">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
+                            </button>
+                        </form>
+                    </div></td>
+                </tr></tbody>
+            </table>
+        </div>
+    </section>
 
-    <h2>Incident category management</h2>
-    <form method="post" th:action="@{/ui/admin/categories}" class="inline">
-        <input name="name" placeholder="Category name" required>
-        <button type="submit">Add category</button>
-    </form>
-    <table>
-        <tr><th>Category</th><th>Update</th></tr>
-        <tr th:each="c : ${categories}"><td th:text="${c.name}"></td>
-            <td><form method="post" th:action="@{/ui/admin/categories/{id}(id=${c.id})}" class="inline">
-                <input name="name" th:value="${c.name}" required>
-                <button type="submit">Save category</button>
-            </form></td>
-        </tr>
-    </table>
+    <section class="admin-card">
+        <div class="admin-section-heading"><div><h2>Incident category management</h2><p>Maintain categories used for incident classification.</p></div></div>
+        <form method="post" th:action="@{/ui/admin/categories}" class="admin-form-grid compact-admin-form">
+            <label>Category name<input name="name" type="text" placeholder="Category name" required></label>
+            <button type="submit" class="admin-form-submit">Add category</button>
+        </form>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Category</th><th>Update</th></tr></thead>
+                <tbody><tr th:each="cat : ${categories}">
+                    <td th:text="${cat.name}"></td>
+                    <td><div class="admin-actions">
+                        <form method="post" th:action="@{/ui/admin/categories/{id}(id=${cat.id})}" class="inline">
+                            <input name="name" type="text" th:value="${cat.name}" aria-label="Category name" required>
+                            <button type="submit">Save</button>
+                        </form>
+                        <form method="post" th:action="@{/ui/admin/categories/{id}/delete(id=${cat.id})}" onsubmit="return confirm('Delete this category?');">
+                            <button type="submit" class="btn-icon-danger" title="Delete" aria-label="Delete category">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
+                            </button>
+                        </form>
+                    </div></td>
+                </tr></tbody>
+            </table>
+        </div>
+    </section>
 
-    <h2>Assignment strategy</h2>
-    <form method="post" th:action="@{/ui/admin/strategy}" class="inline">
-        <select name="name">
-            <option th:each="s : ${strategies}" th:value="${s}" th:text="${s}" th:selected="${s == activeStrategy}"></option>
-        </select>
-        <button type="submit">Apply</button>
-    </form>
+    <section class="admin-card admin-compact-card">
+        <div class="admin-section-heading"><div><h2>Assignment strategy</h2><p>Choose how new incidents are assigned.</p></div></div>
+        <form method="post" th:action="@{/ui/admin/strategy}" class="inline">
+            <select name="name"><option th:each="s : ${strategies}" th:value="${s}" th:text="${s}" th:selected="${s == activeStrategy}"></option></select>
+            <button type="submit">Apply strategy</button>
+        </form>
+    </section>
 
-    <h2>SLA policies</h2>
-    <table>
-        <tr><th>Priority</th><th>Service</th><th>Response / resolution target (minutes)</th></tr>
-        <tr th:each="p : ${policies}">
-            <td th:text="${p.priority}"></td>
-            <td th:text="${p.service?.name ?: 'All services'}"></td>
-            <td>
-                <form method="post" th:action="@{/ui/admin/sla/{id}(id=${p.id})}" class="inline">
-                    <input type="number" name="response" min="1" th:value="${p.responseMinutes}">
-                    <input type="number" name="resolution" min="1" th:value="${p.resolutionMinutes}">
+    <section class="admin-card">
+        <div class="admin-section-heading"><div><h2>SLA policies</h2><p>Adjust response and resolution targets by priority and service.</p></div></div>
+        <div class="admin-table-wrap"><table class="admin-table">
+            <thead><tr><th>Priority</th><th>Service</th><th>Response / resolution target (minutes)</th></tr></thead>
+            <tbody><tr th:each="p : ${policies}">
+                <td th:text="${p.priority}"></td><td th:text="${p.service?.name ?: 'All services'}"></td>
+                <td><form method="post" th:action="@{/ui/admin/sla/{id}(id=${p.id})}" class="inline">
+                    <input type="number" name="response" min="1" th:value="${p.responseMinutes}" aria-label="Response target minutes">
+                    <input type="number" name="resolution" min="1" th:value="${p.resolutionMinutes}" aria-label="Resolution target minutes">
                     <button type="submit">Save</button>
-                </form>
-            </td>
-        </tr>
-    </table>
+                </form></td>
+            </tr></tbody>
+        </table></div>
+    </section>
 
-    <h2>Audit log (latest 50)</h2>
-    <table>
-        <tr><th>Time</th><th>User</th><th>Incident</th><th>Action</th><th>From</th><th>To</th><th>Description</th></tr>
-        <tr th:each="h : ${audit}">
-            <td th:text="${#temporals.format(h.timestamp, 'dd MMM HH:mm:ss')}"></td>
-            <td th:text="${h.actor}"></td>
-            <td><a th:href="@{/ui/incidents/{id}(id=${h.incidentId})}" th:text="${'INC' + h.incidentId}"></a></td>
-            <td th:text="${h.action}"></td><td th:text="${h.previousState}"></td><td th:text="${h.newState}"></td>
-            <td th:text="${h.description}"></td>
-        </tr>
-    </table>
+    <section class="admin-card">
+        <div class="admin-section-heading"><div><h2>Audit log</h2><p>Latest 50 administrative and incident events.</p></div></div>
+        <div class="admin-table-wrap"><table class="admin-table">
+            <thead><tr><th>Time</th><th>User</th><th>Incident</th><th>Action</th><th>From</th><th>To</th><th>Description</th></tr></thead>
+            <tbody><tr th:each="h : ${audit}">
+                <td th:text="${#temporals.format(h.timestamp, 'dd MMM HH:mm:ss')}"></td><td th:text="${h.actor}"></td>
+                <td><a th:href="@{/ui/incidents/{id}(id=${h.incidentId})}" th:text="${'INC' + h.incidentId}"></a></td>
+                <td th:text="${h.action}"></td><td th:text="${h.previousState != null ? h.previousState : '—'}"></td><td th:text="${h.newState != null ? h.newState : '—'}"></td>
+                <td th:text="${h.description}"></td>
+            </tr></tbody>
+        </table></div>
+    </section>
 </main>
 </body>
 </html>

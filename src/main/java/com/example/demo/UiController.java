@@ -360,6 +360,17 @@ public class UiController {
         return "redirect:/ui/admin";
     }
 
+    @PostMapping("/ui/admin/services/{id}/delete")
+    public String deleteService(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            adminManagement.deleteService(id);
+            ra.addFlashAttribute("ok", "IT service deleted.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/ui/admin";
+    }
+
     @PostMapping("/ui/admin/categories")
     public String createCategory(@RequestParam String name, RedirectAttributes ra) {
         try {
@@ -376,6 +387,17 @@ public class UiController {
         try {
             adminManagement.updateCategory(id, name);
             ra.addFlashAttribute("ok", "Incident category updated.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/ui/admin";
+    }
+
+    @PostMapping("/ui/admin/categories/{id}/delete")
+    public String deleteCategory(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            adminManagement.deleteCategory(id);
+            ra.addFlashAttribute("ok", "Incident category deleted.");
         } catch (Exception ex) {
             ra.addFlashAttribute("error", ex.getMessage());
         }

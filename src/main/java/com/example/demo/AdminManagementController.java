@@ -64,6 +64,9 @@ class AdminManagementController {
         return management.updateService(id, request.name(), request.businessCriticality());
     }
 
+    @DeleteMapping("/services/{id}")
+    void deleteService(@PathVariable Long id) { management.deleteService(id); }
+
     @GetMapping("/categories")
     List<Category> categories() { return management.categories(); }
 
@@ -76,4 +79,7 @@ class AdminManagementController {
     Category updateCategory(@PathVariable Long id, @RequestBody CategoryRequest request) {
         return management.updateCategory(id, request.name());
     }
+
+    @DeleteMapping("/categories/{id}")
+    void deleteCategory(@PathVariable Long id) { management.deleteCategory(id); }
 }
