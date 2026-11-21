@@ -174,6 +174,11 @@ record FeedbackPayload(Integer rating, String comment) {}
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+	@ExceptionHandler(org.springframework.dao.DataAccessException.class)
+	ResponseEntity<String> databaseUnavailable(org.springframework.dao.DataAccessException e) {
+		return ResponseEntity.status(503)
+				.body("Database temporarily unavailable. Please try again shortly.");
+	}
 	@ExceptionHandler(InvalidStateTransitionException.class)
 	ResponseEntity<String> invalid(InvalidStateTransitionException e) {
 		return ResponseEntity.status(409).body(e.getMessage());

@@ -8,11 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.mail.MailSendException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -231,6 +238,49 @@ class DemoApplicationTests {
         Long reporterId = incident.getReporter().getId();
         assertTrue(notificationRepository.findByRecipientIdOrderByCreatedAtDesc(reporterId).stream()
                 .anyMatch(n -> incident.getId().equals(n.getIncidentId()) && n.getMessage().contains("Incident created")));
+    }
+
+    @Test
+    void databaseAccessExceptionsReturnGenericServiceUnavailableResponse() {
+        ResponseEntity<String> response = new GlobalExceptionHandler().databaseUnavailable(
+                new DataAccessResourceFailureException("sensitive database connection detail"));
+
+        assertEquals(503, response.getStatusCode().value());
+        assertEquals("Database temporarily unavailable. Please try again shortly.", response.getBody());
+        assertFalse(response.getBody().contains("sensitive database connection detail"));
+    }
+
+    @Test
+    void smtpFailureDoesNotStopIncidentCreationOrInAppNotificationDispatch() {
+        JavaMailSender mailSender = mock(JavaMailSender.class);
+        doThrow(new MailSendException("simulated SMTP outage"))
+                .when(mailSender).send(any(SimpleMailMessage.class));
+        EmailNotificationObserver emailObserver = new EmailNotificationObserver();
+        ReflectionTestUtils.setField(emailObserver, "mailSender", mailSender);
+        ReflectionTestUtils.setField(emailObserver, "fromEmail", "itsm@example.com");
+
+        NotificationRepository notificationStore = mock(NotificationRepository.class);
+        IncidentEventPublisher publisher = new IncidentEventPublisher(List.of(
+                emailObserver, new InAppNotificationObserver(notificationStore)));
+        IncidentRepository incidents = mock(IncidentRepository.class);
+        when(incidents.save(any(Incident.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        User reporter = new Employee("External Reporter", "reporter@example.com", "Operations");
+        UserRepository users = mock(UserRepository.class);
+        when(users.findByEmail(reporter.getEmail())).thenReturn(Optional.of(reporter));
+        ItService service = new ItService("Mail service", 3);
+        ItServiceRepository services = mock(ItServiceRepository.class);
+        when(services.findById(88L)).thenReturn(Optional.of(service));
+
+        IncidentService incidentService = new IncidentService(incidents, users, services, mock(CategoryRepository.class),
+                new ScoreBasedPriorityStrategy(), mock(AssignmentService.class), publisher,
+                mock(CategoryClassifier.class), mock(SlaService.class), mock(IncidentCorrelationService.class));
+
+        Incident created = assertDoesNotThrow(() -> incidentService.create(
+                new CreateIncidentRequest("External mail workflow test", 88L, null, 2, 2), reporter.getEmail()));
+
+        assertNotNull(created);
+        verify(mailSender).send(any(SimpleMailMessage.class));
+        verify(notificationStore).save(any(Notification.class));
     }
 
     @Test
