@@ -5,8 +5,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.Arrays;
@@ -99,6 +101,11 @@ public class UiController {
                                 @RequestParam(required = false) Priority priority,
                                 @RequestParam(required = false) String text,
                                 @RequestParam(required = false, defaultValue = "false") boolean mine,
+                                @RequestParam(required = false) Long categoryId,
+                                @RequestParam(required = false) Long serviceId,
+                                @RequestParam(required = false) String slaStatus,
+                                @RequestParam(required = false) Long technicianId,
+                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                 Authentication auth, Model model) {
         boolean isTechnician = auth != null && auth.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_TECHNICIAN"));
@@ -108,14 +115,28 @@ public class UiController {
             User user = userRepo.findByEmail(auth.getName()).orElse(null);
             if (user instanceof Technician) assignedTechId = user.getId();
         }
+        Long filterTechnicianId = isTechnician ? (mine ? assignedTechId : null) : technicianId;
+        String categoryName = categoryId == null ? null : categoryRepo.findById(categoryId)
+                .map(Category::getName).orElse("__unknown_category__");
+        String serviceName = serviceId == null ? null : serviceRepo.findById(serviceId)
+                .map(ItService::getName).orElse("__unknown_service__");
         IncidentSearchCriteria criteria = new IncidentSearchCriteria(null, status, priority,
-                null, null, assignedTechId, null, null, null, text);
+                categoryName, serviceName, filterTechnicianId, slaStatus, fromDate, null, text);
         model.addAttribute("incidents", searchService.search(criteria, incident ->
                 guard.isStaff(auth) || incident.getReporter().getEmail().equals(auth.getName())));
         model.addAttribute("statuses", IncidentStatus.values());
         model.addAttribute("priorities", Priority.values());
+        model.addAttribute("categories", categoryRepo.findAll());
+        model.addAttribute("services", serviceRepo.findAll());
+        model.addAttribute("technicians", isTechnician ? List.of() : adminManagement.technicians());
+        model.addAttribute("slaStatuses", List.of("ON_TRACK", "WARNING", "BREACHED"));
         model.addAttribute("status", status);
         model.addAttribute("priority", priority);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("serviceId", serviceId);
+        model.addAttribute("slaStatus", slaStatus);
+        model.addAttribute("technicianId", isTechnician ? null : technicianId);
+        model.addAttribute("fromDate", fromDate);
         model.addAttribute("text", text);
         model.addAttribute("mine", mine && isTechnician && assignedTechId != null);
         return "incidents";

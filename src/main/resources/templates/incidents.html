@@ -7,11 +7,22 @@
   <div th:replace="~{fragments :: flash}"></div>
   <h2>Incidents</h2>
   <form method="get" th:action="@{/ui/incidents}" class="filters">
-    <select name="status"><option value="">Any status</option>
+    <select name="status" aria-label="Status"><option value="">Any status</option>
       <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == status}"></option></select>
-    <select name="priority"><option value="">Any priority</option>
+    <select name="priority" aria-label="Priority"><option value="">Any priority</option>
       <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}" th:selected="${p == priority}"></option></select>
-    <input type="text" name="text" placeholder="Search description" th:value="${text}">
+    <select name="categoryId" aria-label="Category"><option value="">Any category</option>
+      <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}" th:selected="${c.id == categoryId}"></option></select>
+    <select name="serviceId" aria-label="Service"><option value="">Any service</option>
+      <option th:each="s : ${services}" th:value="${s.id}" th:text="${s.name}" th:selected="${s.id == serviceId}"></option></select>
+    <select name="slaStatus" aria-label="SLA status"><option value="">Any SLA status</option>
+      <option th:each="s : ${slaStatuses}" th:value="${s}" th:text="${s}" th:selected="${s == slaStatus}"></option></select>
+    <select name="technicianId" aria-label="Technician" th:if="${isAdmin or !isStaff}">
+      <option value="">Any technician</option>
+      <option th:each="t : ${technicians}" th:value="${t.id}" th:text="${t.name}" th:selected="${t.id == technicianId}"></option>
+    </select>
+    <input type="date" name="fromDate" aria-label="Created on or after" title="Created on or after" th:value="${fromDate}">
+    <input type="text" name="text" placeholder="Search ID or keyword" aria-label="Search ID or keyword" th:value="${text}">
     <label th:if="${isTechnician}"><input type="checkbox" name="mine" value="true" th:checked="${mine}"> My assigned</label>
     <button type="submit">Filter</button>
   </form>
